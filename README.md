@@ -39,6 +39,16 @@ Interface para parceiros de entrega.
 * **Build System:** Apache Maven.
 * **Arquitetura:** MVC + DAO Pattern + Singleton.
 
+ ## 👥 Time de Desenvolvimento
+
+Responsáveis pela implementação e arquitetura da solução:
+
+* **__________________________________** - *Lead Architect & DBA*
+* **__________________________________** - *Backend Developer (Inventory)*
+* **__________________________________** - *Frontend Developer (Client Experience)*
+* **__________________________________** - *Data Engineer (Transactions & Logistics)*
+* **__________________________________** - *QA Engineer & Tech Lead*
+
 ## 📚 Instalação e Execução
 
 ### Pré-requisitos
