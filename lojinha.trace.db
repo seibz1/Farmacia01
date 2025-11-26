@@ -64,3 +64,9 @@ INSERT INTO produtos (nome, descricao, preco, quantidade, categoria_id, dosagem,
 	at org.h2.jdbc.JdbcConnection.prepareStatement(JdbcConnection.java:316)
 	at br.com.moicano.lojinha.dao.ProdutoDAO.criar(ProdutoDAO.java:19)
 	at br.com.moicano.lojinha.App.main(App.java:47)
+2025-11-26 15:10:21.523631-03:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "SELECT * FROM pedidos WHERE status IS NOT [*]'ENTREGUE' ORDER BY data ASC"; expected "OF, JSON, NULL, DISTINCT, TRUE, FALSE, UNKNOWN"; SQL statement:
+SELECT * FROM pedidos WHERE status IS NOT 'ENTREGUE' ORDER BY data ASC [42001-224]
+2025-11-26 15:16:42.108388-03:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "SELECT * FROM pedidos WHERE status IS NOT [*]'ENTREGUE' ORDER BY data ASC"; expected "OF, JSON, NULL, DISTINCT, TRUE, FALSE, UNKNOWN"; SQL statement:
+SELECT * FROM pedidos WHERE status IS NOT 'ENTREGUE' ORDER BY data ASC [42001-224]

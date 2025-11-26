@@ -1,6 +1,10 @@
+// Localização: src/main/java/br/com/moicano/lojinha/view/ClienteView.java
+// VERSÃO FINAL: COM FAVORITOS E COMENTADA
+
 package br.com.moicano.lojinha.view;
 
 // Importa todos os "trabalhadores" (DAOs) e "moldes" (Models) necessários
+import br.com.moicano.lojinha.dao.FavoritoDAO; // PONTO ESSENCIAL: Import do novo DAO
 import br.com.moicano.lojinha.dao.ItemPedidoDAO;
 import br.com.moicano.lojinha.dao.PedidoDAO;
 import br.com.moicano.lojinha.dao.ProdutoDAO;
@@ -16,39 +20,37 @@ import java.util.Scanner;
 public class ClienteView {
     private final Scanner scanner;
 
-    // PONTO ESSENCIAL: A tela do Cliente precisa de conhecer
-    // TODOS os "trabalhadores" (DAOs) para funcionar.
+    // A tela do Cliente precisa de conhecer TODOS os "trabalhadores"
     private final ProdutoDAO produtoDAO;
     private final PedidoDAO pedidoDAO;
     private final ItemPedidoDAO itemPedidoDAO;
+    private final FavoritoDAO favoritoDAO; // PONTO ESSENCIAL: Novo trabalhador de favoritos
 
-    // PONTO CONFUSO: O "Carrinho" não é guardado no banco.
-    // É apenas uma lista temporária (ArrayList) que vive
-    // dentro desta tela, enquanto o cliente está a comprar.
+    // O "Carrinho" é uma lista temporária que vive apenas na memória desta tela
     private final List<ItemPedido> carrinho;
 
     public ClienteView() {
         this.scanner = new Scanner(System.in);
-
-        // Quando a tela "nasce", ela cria as suas próprias instâncias dos DAOs
+        // Inicializa todos os DAOs (Trabalhadores)
         this.produtoDAO = new ProdutoDAO();
         this.pedidoDAO = new PedidoDAO();
         this.itemPedidoDAO = new ItemPedidoDAO();
+        this.favoritoDAO = new FavoritoDAO(); // Inicializa o FavoritoDAO
 
-        // E cria um carrinho vazio
-        this.carrinho = new ArrayList<>();
+        this.carrinho = new ArrayList<>(); // Cria o carrinho vazio
     }
 
-    // O loop principal da "Loja"
+    // Loop principal do menu do Cliente
     public void iniciar() {
         int opcao;
         do {
             System.out.println("\n" + "=".repeat(50));
             System.out.println("BEM-VINDO À FARMÁCIA BIQUEIRA LEGAL!");
             System.out.println("=".repeat(50));
-            System.out.println("1 - Ver produtos e Adicionar ao Carrinho");
+            System.out.println("1 - Ver produtos / Adicionar ao Carrinho");
             System.out.println("2 - Ver Carrinho");
             System.out.println("3 - Finalizar Compra");
+            System.out.println("4 - Meus Favoritos ⭐"); // PONTO ESSENCIAL: Nova opção no menu
             System.out.println("0 - Voltar ao Menu Principal");
             System.out.println("=".repeat(50));
             System.out.print("Escolha uma opção: ");
@@ -59,25 +61,78 @@ public class ClienteView {
                 case 1 -> adicionarAoCarrinho();
                 case 2 -> verCarrinho();
                 case 3 -> finalizarCompra();
+                case 4 -> gerenciarFavoritos(); // Chama o sub-menu de favoritos
                 case 0 -> System.out.println("Voltando...");
                 default -> System.out.println("ERRO: Opção inválida!");
             }
         } while (opcao != 0);
     }
 
-    // Passo 1: O cliente vê os produtos e escolhe
+    // --- PONTO ESSENCIAL: NOVO SUB-MENU DE FAVORITOS ---
+    private void gerenciarFavoritos() {
+        int opcao;
+        do {
+            System.out.println("\n--- ⭐ MEUS FAVORITOS ⭐ ---");
+
+            // 1. Pede ao DAO para buscar a lista do banco
+            List<Produto> favs = favoritoDAO.listarFavoritos();
+
+            if (favs.isEmpty()) {
+                System.out.println("(Sua lista de favoritos está vazia)");
+            } else {
+                // 2. Mostra cada produto favoritado
+                favs.forEach(System.out::println);
+            }
+
+            System.out.println("\n1 - Adicionar Produto aos Favoritos");
+            System.out.println("2 - Remover Produto dos Favoritos");
+            System.out.println("0 - Voltar");
+            System.out.print("Escolha: ");
+
+            opcao = lerInteiro();
+
+            switch (opcao) {
+                case 1 -> adicionarFavorito();
+                case 2 -> removerFavorito();
+                case 0 -> System.out.println("Voltando para a loja...");
+                default -> System.out.println("Opção inválida.");
+            }
+        } while (opcao != 0);
+    }
+
+    private void adicionarFavorito() {
+        System.out.print("Digite o ID do produto para favoritar: ");
+        int id = lerInteiro();
+
+        // Verifica se o produto existe antes de favoritar
+        Produto p = produtoDAO.buscarPorId(id);
+        if (p != null) {
+            favoritoDAO.adicionar(id); // Chama o trabalhador para salvar
+            System.out.println("SUCESSO: " + p.getNome() + " foi adicionado aos favoritos!");
+        } else {
+            System.out.println("ERRO: Produto não encontrado.");
+        }
+    }
+
+    private void removerFavorito() {
+        System.out.print("Digite o ID do produto para remover dos favoritos: ");
+        int id = lerInteiro();
+        favoritoDAO.remover(id); // Chama o trabalhador para apagar
+        System.out.println("Produto removido dos favoritos (se existia).");
+    }
+    // --- FIM DA LÓGICA DE FAVORITOS ---
+
+    // Lógica de Compra (Carrinho)
     private void adicionarAoCarrinho() {
         System.out.println("\n--- NOSSOS PRODUTOS ---");
-        // 1. Usa o "trabalhador" de produtos para buscar tudo do banco
         List<Produto> produtos = produtoDAO.buscarTodos();
         if (produtos.isEmpty()) {
             System.out.println("Desculpe, estamos sem estoque no momento.");
             return;
         }
-        produtos.forEach(System.out::println); // Imprime cada produto
+        produtos.forEach(System.out::println);
         System.out.println("-------------------------");
 
-        // 2. Pede ao cliente o ID e a quantidade
         System.out.print("Digite o ID do produto que deseja adicionar (0 para cancelar): ");
         int idProduto = lerInteiro();
         if (idProduto == 0) return;
@@ -95,23 +150,20 @@ public class ClienteView {
             return;
         }
 
-        // 3. PONTO ESSENCIAL: Verifica se temos stock suficiente
+        // Verifica o estoque disponível
         if (quantidade > produtoEscolhido.getQuantidade()) {
             System.out.println("ERRO: Desculpe, só temos " + produtoEscolhido.getQuantidade() + " em estoque.");
             return;
         }
 
-        // 4. Cria um "Item" (linha do recibo) temporário
+        // Cria um item temporário e adiciona ao carrinho (na memória)
         ItemPedido item = new ItemPedido(null, idProduto, quantidade, produtoEscolhido.getPreco());
-        item.setProdutoNome(produtoEscolhido.getNome()); // Guarda o nome para mostrar no carrinho
-
-        // 5. Adiciona o item à lista (carrinho) temporária
+        item.setProdutoNome(produtoEscolhido.getNome());
         carrinho.add(item);
 
         System.out.println("SUCESSO: " + quantidade + "x " + produtoEscolhido.getNome() + " adicionado(s) ao carrinho!");
     }
 
-    // Passo 2: O cliente vê o que já escolheu
     private void verCarrinho() {
         if (carrinho.isEmpty()) {
             System.out.println("\nO seu carrinho está vazio.");
@@ -120,67 +172,59 @@ public class ClienteView {
 
         System.out.println("\n--- MEU CARRINHO ---");
         double total = 0;
-        // Passa por cada item no carrinho e calcula o subtotal
         for (ItemPedido item : carrinho) {
-            System.out.println(item.toString()); // Usa o toString() do ItemPedido.java
+            System.out.println(item.toString());
             total += (item.getPrecoUnitario() * item.getQuantidade());
         }
         System.out.println("-------------------------");
         System.out.printf("VALOR TOTAL: R$ %.2f\n", total);
     }
 
-    // PONTO MAIS IMPORTANTE E CONFUSO DO PROJETO:
-    // O "Checkout" (Finalizar a Compra)
+    // PONTO MAIS IMPORTANTE: O Checkout (Finalizar Compra)
     private void finalizarCompra() {
         if (carrinho.isEmpty()) {
             System.out.println("ERRO: Seu carrinho está vazio. Adicione produtos primeiro.");
             return;
         }
 
-        verCarrinho(); // Mostra o resumo
+        verCarrinho();
 
         System.out.print("\nDigite seu nome para o pedido: ");
         String nomeCliente = scanner.nextLine();
 
-        // Calcula o valor total final
         double valorTotal = 0;
         for (ItemPedido item : carrinho) {
             valorTotal += (item.getPrecoUnitario() * item.getQuantidade());
         }
 
         try {
-            // --- INÍCIO DA "TRANSAÇÃO" (A MÁGICA) ---
+            // --- INÍCIO DA TRANSAÇÃO ---
 
-            // 1. Define o status inicial (para o Entregador)
+            // 1. Define o status inicial para o Entregador ver depois
             String statusInicial = "AGUARDANDO";
 
-            // 2. Cria o "Molde" do Recibo (Pedido) principal
+            // 2. Cria o Recibo (Pedido) e salva no banco
             Pedido novoPedido = new Pedido(LocalDateTime.now(), valorTotal, nomeCliente, statusInicial);
+            Integer pedidoId = pedidoDAO.criar(novoPedido); // Retorna o ID gerado (ex: 123)
 
-            // 3. Salva o Recibo no banco e Pega o ID (ex: 123)
-            //    (Aqui usamos o método especial do PedidoDAO)
-            Integer pedidoId = pedidoDAO.criar(novoPedido);
-
-            // 4. Se o ID não foi criado, dá erro.
             if (pedidoId == null) {
                 throw new RuntimeException("Não foi possível criar o pedido.");
             }
 
-            // 5. Loop: Passa por cada item no "carrinho" temporário
+            // 3. Loop para salvar cada item do carrinho
             for (ItemPedido item : carrinho) {
-                // 5a. "Liga" o item ao recibo (usando o ID 123)
+                // Liga o item ao ID do pedido (123)
                 item.setPedidoId(pedidoId);
-                // 5b. Salva a "linha" (ItemPedido) no banco
                 itemPedidoDAO.criar(item);
 
-                // 5c. BÓNUS ESSENCIAL: Atualiza o stock do produto original
+                // PONTO CRÍTICO: Atualiza o estoque do produto
                 Produto produtoComprado = produtoDAO.buscarPorId(item.getProdutoId());
                 int novoEstoque = produtoComprado.getQuantidade() - item.getQuantidade();
                 produtoComprado.setQuantidade(novoEstoque);
-                produtoDAO.atualizar(produtoComprado); // Salva o produto com o novo stock
+                produtoDAO.atualizar(produtoComprado); // Salva a nova quantidade no banco
             }
 
-            // --- FIM DA "TRANSAÇÃO" ---
+            // --- FIM DA TRANSAÇÃO ---
 
             System.out.println("\n" + "=".repeat(50));
             System.out.println("COMPRA FINALIZADA COM SUCESSO!");
@@ -188,19 +232,18 @@ public class ClienteView {
             System.out.println("Seu pedido (Nº " + pedidoId + ") foi registrado com o status: " + statusInicial);
             System.out.println("=".repeat(50));
 
-            carrinho.clear(); // Esvazia o carrinho para a próxima compra
+            carrinho.clear(); // Limpa o carrinho para a próxima compra
 
         } catch (Exception e) {
             System.out.println("ERRO CRÍTICO AO FINALIZAR COMPRA: " + e.getMessage());
         }
     }
 
-    // Função "ajudante" para ler números
     private int lerInteiro() {
         try {
             return Integer.parseInt(scanner.nextLine());
         } catch (NumberFormatException e) {
-            return -1; // Retorna -1 se o utilizador digitar "abc"
+            return -1;
         }
     }
 }
