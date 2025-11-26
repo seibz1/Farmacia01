@@ -1,55 +1,58 @@
-# 🚀 Projeto Lojinha - Sistema de E-commerce de Farmácia
+# 💊 Biqueira Legal - Pharmacy Management System
 
-Este é um projeto académico de um sistema de gestão para um e-commerce de farmácia (Biqueira Legal), simulado inteiramente via consola. O sistema foi desenvolvido em Java, utilizando o padrão DAO para acesso a dados e um banco de dados H2 em memória.
+Sistema completo de gestão e e-commerce farmacêutico desenvolvido em Java. A aplicação oferece uma solução integrada via terminal (CLI) para gerenciar o ciclo de vida de vendas, desde o controle de estoque até a logística de entrega.
 
-O projeto cumpre os requisitos de gerir múltiplos perfis de utilizador, implementando os fluxos de **Administrador (Lojista)**, **Cliente (Usuário)** e **Entregador**.
+O projeto foi arquitetado utilizando o padrão **DAO (Data Access Object)** e **MVC**, garantindo modularidade, escalabilidade e persistência de dados eficiente.
 
-## 💻 Funcionalidades Implementadas
+## 🚀 Funcionalidades
 
-O sistema está dividido em três perfis principais, acessíveis através do menu inicial:
+O sistema opera através de um ecossistema de três perfis integrados:
 
-### 1. 🛒 Perfil de Cliente (Usuário)
-O fluxo de compra completo do cliente:
-* Visualizar todos os produtos disponíveis (com stock).
-* Adicionar produtos a um carrinho de compras temporário.
-* Ver o carrinho de compras e o valor total.
-* Finalizar a compra, registando um novo **Pedido** com o status "AGUARDANDO".
-* O stock dos produtos é atualizado (diminuído) automaticamente após a compra.
+### 1. 🛒 Módulo do Cliente (Storefront)
+Interface dedicada ao consumidor final.
+* **Catálogo Inteligente:** Visualização de medicamentos com detalhes regulatórios (dosagem, retenção de receita).
+* **Carrinho de Compras:** Gestão de itens em memória antes do checkout.
+* **Gestão de Favoritos:** Persistência de produtos preferidos pelo usuário.
+* **Checkout Transacional:** Processamento de pedidos com baixa automática de estoque e geração de ordens de serviço.
 
-### 2. 👨‍💼 Perfil de Administrador (Lojista)
-O fluxo de gestão de inventário:
-* **Gerenciamento de Produtos (CRUD completo):**
-    * Criar, Listar, Atualizar e Remover produtos.
-    * Inclui campos personalizados para farmácia, como `dosagem` e `requerReceita`.
-* **Gerenciamento de Categorias (CRUD completo):**
-    * Criar, Listar, Atualizar e Remover categorias para organizar os produtos.
+### 2. 👨‍💼 Módulo Administrativo (Backoffice)
+Painel de controle para gestores e farmacêuticos.
+* **Controle de Estoque (WMS):** Cadastro e auditoria de produtos com validação de dados críticos.
+* **Taxonomia:** Gestão de categorias para organização do inventário.
+* **Monitoramento:** Visualização em tempo real da disponibilidade de produtos.
 
-### 3. 🚚 Perfil de Entregador (Logística)
-O fluxo de logística e entrega:
-* Visualizar uma lista de todos os pedidos ativos (com status "AGUARDANDO" ou "EM ROTA").
-* Atualizar o status de um pedido (de "AGUARDANDO" -> "EM ROTA" -> "ENTREGUE").
-* Simula o processo de entrega desde a loja até ao cliente.
+### 3. 🚚 Módulo Logístico (Last Mile)
+Interface para parceiros de entrega.
+* **Fila de Pedidos:** Visualização filtrada de ordens com status `AGUARDANDO`.
+* **Workflow de Entrega:** Atualização de status em tempo real:
+    1.  `AGUARDANDO` (Pedido processado)
+    2.  `EM ROTA` (Em trânsito)
+    3.  `ENTREGUE` (Finalizado)
 
-## ⚙️ Tecnologias e Ferramentas
+---
 
-* **Java:** Linguagem principal da aplicação.
-* **JDBC:** Para a conectividade com o banco de dados.
-* **H2 Database (In-Memory):** Banco de dados leve e em memória para facilitar os testes e a execução.
-* **Maven:** Gestor de dependências (para incluir o driver H2).
-* **Padrão DAO (Data Access Object):** Para separar a lógica de negócio das regras de acesso ao banco de dados.
-* **🤖 Assistência de IA:** Uma ferramenta de IA (Gemini) foi utilizada para auxiliar na refatoração, depuração (debug), indentação do código e geração de documentação.
+## 🛠️ Stack Tecnológico
 
-## 📚 Como Executar
+* **Core:** Java JDK 17 (LTS).
+* **Persistência:** JDBC (Java Database Connectivity).
+* **Database:** H2 Database Engine (In-Memory mode para alta performance em desenvolvimento).
+* **Build System:** Apache Maven.
+* **Arquitetura:** MVC + DAO Pattern + Singleton.
 
-1.  Abra o projeto na sua IDE (ex: IntelliJ IDEA).
-2.  (Se for a primeira vez) Aguarde o Maven carregar a dependência do H2 (definida no `pom.xml`).
-3.  Encontre o ficheiro principal `App.java` na localização:
-    `src/main/java/br/com/moicano/lojinha/App.java`
-4.  Execute o método `main()` deste ficheiro (clicando no "Play").
-5.  O menu principal com os três perfis será exibido na consola.
+## 📚 Instalação e Execução
 
-## 💡 Nota Importante sobre o Banco de Dados H2
+### Pré-requisitos
+* Java 17 ou superior.
+* Maven instalado e configurado.
 
-O projeto está configurado para usar o H2 no modo **em memória** e a lógica em `DatabaseConnection.java` utiliza `DROP TABLE IF EXISTS...` e `CREATE TABLE...` a cada execução.
+### Passos
+1.  **Clonar o repositório:**
+    ```bash
+    git clone [https://github.com/SEU-USUARIO/lojinha.git](https://github.com/SEU-USUARIO/lojinha.git)
+    ```
+2.  **Importar o projeto:**
+    Abra o diretório na sua IDE de preferência (IntelliJ IDEA, Eclipse, VS Code).
+3.  **Executar:**
+    Localize a classe principal em `src/main/java/br/com/moicano/lojinha/App.java` e execute o método `main`.
 
-**Isto significa que o banco de dados é 100% limpo e recriado do zero toda vez que o `App.java` é iniciado.** Todos os dados de testes (produtos, pedidos, etc.) serão apagados quando o programa fechar. Isto foi feito intencionalmente para garantir um ambiente de testes limpo e facilitar a correção, sem necessidade de configuração externa.
+> **Nota de Infraestrutura:** A aplicação utiliza o H2 em modo memória volátil. O esquema de banco de dados (DDL) é recriado automaticamente a cada inicialização (`DatabaseConnection.initDatabase`) para garantir um ambiente limpo e consistente para testes e demonstrações.
