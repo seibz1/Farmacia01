@@ -43,11 +43,12 @@ Interface para parceiros de entrega.
 
 Responsáveis pela implementação e arquitetura da solução:
 
-* **__________________________________** - *Lead Architect & DBA*
-* **__________________________________** - *Backend Developer (Inventory)*
-* **__________________________________** - *Frontend Developer (Client Experience)*
-* **__________________________________** - *Data Engineer (Transactions & Logistics)*
-* **__________________________________** - *QA Engineer & Tech Lead*
+* LUCAS PATRICK- Arquiteto Líder & DBA*
+* LUCCA SEIB - Desenvolvedor Backend (Estoque)*
+* LUIS GUSTAVO - Desenvolvedor Frontend (Experiência do Cliente)*
+* MARCOS MIGUEL - Engenheiro de Dados (Transações & Logística)*
+* RODRIGO CASTRO - Engenheiro de QA & Tech Lead*
+
 
 ## 📚 Instalação e Execução
 
